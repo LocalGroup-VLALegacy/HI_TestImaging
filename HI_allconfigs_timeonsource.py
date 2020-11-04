@@ -32,6 +32,9 @@ print(time_on_source)
 
 ratios = [time_on_source[config] / time_on_source['D'] for config in "ABCD"]
 
+# This is the full XL setup, with half the time in D compared to the rest
+ratios_full = [time_on_source[config] / (0.5 * time_on_source['D']) for config in "ABCD"]
+
 print(ratios)
 # [8.3495495505805479, 3.0843243229496586, 3.5513513513513515, 1.0]
 
@@ -67,6 +70,7 @@ def accumulate_to(scantime_dict, target=time_on_source['D']):
     return scans
 
 equivtime_scans = dict.fromkeys(['D', 'C', 'B', 'A'])
+xltime_scans = dict.fromkeys(['D', 'C', 'B', 'A'])
 
 for config in vis_nocontsubs:
 
@@ -74,11 +78,16 @@ for config in vis_nocontsubs:
 
     equivtime_scans[config] = accumulate_to(out['minutes_on_science_per_scan'])
 
+    xltime_scans[config] = accumulate_to(out['minutes_on_science_per_scan'],
+                                         target=time_on_source['D'] * 2.)
+
+
     # If this is D config, this should be ALL the scans. Do sanity check:
     if config == 'D':
         assert equivtime_scans['D'] == list(out['minutes_on_science_per_scan'].keys())
 
     equivtime_scans[config].sort()
+    xltime_scans[config].sort()
 
 # For reference
 print(equivtime_scans)
@@ -89,3 +98,9 @@ print(equivtime_scans)
 
 # NOTE: these are NOT necessarily in time order. But that might actually be better?
 # Better uv-coverage if taking scans from different tracks?
+
+print(xltime_scans)
+# {'A': [4, 6, 8, 10, 12, 14, 16, 18, 19, 21, 23, 25],
+# 'C': [9, 17, 25, 33, 41, 49, 57, 65, 135, 149, 157, 165, 173, 187, 195, 257, 265, 287, 295, 303, 317, 387, 395, 403, 411, 449, 465, 479, 495, 503, 517, 525],
+# 'B': [9, 17, 25, 33, 41, 49, 63, 71, 79, 133, 141, 149, 157, 165, 173, 187, 195, 203, 211, 257, 265, 273, 281, 295, 303, 311, 333, 387, 395, 409, 417, 433],
+# 'D': [26, 89, 152, 215, 278, 341, 404, 467, 530, 593, 656, 719, 782, 845, 908]}

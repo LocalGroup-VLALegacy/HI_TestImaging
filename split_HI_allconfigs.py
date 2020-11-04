@@ -94,7 +94,7 @@ concat(concatvis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_
 uvcontsub(vis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms'),
           fitorder=0)
 
-os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms')),
-                                 os.path.join(output_path, '18A-467_HI_spw_0.ms'))
-os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms.contsub')),
-                                 os.path.join(output_path, '18A-467_HI_spw_0.ms.contsub'))
+os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms'),
+                                 os.path.join(output_path, '18A-467_HI_spw_0.ms')))
+os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms.contsub'),
+                                 os.path.join(output_path, '18A-467_HI_spw_0.ms.contsub')))

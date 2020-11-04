@@ -79,7 +79,7 @@ for has_Aconfig in with_Aconfig:
                 print("On {0} {1} {2}\nIncludes A conf? {3}".format(weight, taper, image_str, has_Aconfig))
 
                 imagename_run = os.path.join(datapath,
-                                            'M31_Field17_{0}_{1}_{2}_{3}'
+                                            'M31_Field17_{0}_{1}_{2}_{3}_timematched'
                                             .format(confs,
                                                     weight,
                                                     taper,

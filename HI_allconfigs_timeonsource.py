@@ -78,12 +78,14 @@ for config in vis_nocontsubs:
     if config == 'D':
         assert equivtime_scans['D'] == list(out['minutes_on_science_per_scan'].keys())
 
+    equivtime_scans[config].sort()
+
 # For reference
 print(equivtime_scans)
 # {'A': [4, 6, 8, 10, 12, 14],
-# 'C': [257, 387, 517, 135, 9, 395, 525, 17, 465, 403, 149, 495, 25, 411, 157, 287],
-# 'B': [409, 257, 387, 133, 311, 9, 395, 273, 141, 17, 149, 281, 25, 157, 33, 165],
-# 'D': [908, 845, 782, 719, 656, 593, 530, 467, 404, 341, 278, 215, 152, 89, 26]}
+# 'C': [9, 17, 25, 135, 149, 157, 257, 287, 387, 395, 403, 411, 465, 495, 517, 525],
+# 'B': [9, 17, 25, 33, 133, 141, 149, 157, 165, 257, 273, 281, 311, 387, 395, 409],
+# 'D': [26, 89, 152, 215, 278, 341, 404, 467, 530, 593, 656, 719, 782, 845, 908]}
 
 # NOTE: these are NOT necessarily in time order. But that might actually be better?
 # Better uv-coverage if taking scans from different tracks?

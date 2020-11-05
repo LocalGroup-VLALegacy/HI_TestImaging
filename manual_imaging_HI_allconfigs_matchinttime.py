@@ -7,6 +7,8 @@
 
 Adjust time integrations per config to match 1:1:1:1
 
+NOTE: The ultimate target is 2:2:2:1, though? Check this and re-run if needed.
+
 NOTE: there are 6.5 hr in A config from 18A-467
 
 '''
@@ -37,6 +39,11 @@ equivtime_scans = \
      'B': "9,17,25,33,133,141,149,157,165,257,273,281,311,387,395,409",
      'D': "26,89,152,215,278,341,404,467,530,593,656,719,782,845,908"}
 
+xltime_scans = \
+    {'A': '4,6,8,10,12,14,16,18,19,21,23,25',
+     'C': '9,17,25,33,41,49,57,65,135,149,157,165,173,187,195,257,265,287,295,303,317,387,395,403,411,449,465,479,495,503,517,525',
+     'B': '9,17,25,33,41,49,63,71,79,133,141,149,157,165,173,187,195,203,211,257,265,273,281,295,303,311,333,387,395,409,417,433',
+     'D': '26,89,152,215,278,341,404,467,530,593,656,719,782,845,908'}
 
 run_dirtyimaging = True
 run_shallowclean = False
@@ -46,7 +53,8 @@ run_deepclean = False
 
 with_Aconfig = [True, False]
 
-with_contsub = [False, True]
+# with_contsub = [False, True]
+with_contsub = [False]
 weightings = ['natural', 'briggs']
 # tapers = ['', '5arcsec']
 tapers = ['']
@@ -69,7 +77,8 @@ for has_Aconfig in with_Aconfig:
             confs = 'BCD'
 
         myvis = [myvis[config] for config in confs]
-        scan_select = [equivtime_scans[config] for config in confs]
+        # scan_select = [equivtime_scans[config] for config in confs]
+        scan_select = [xltime_scans[config] for config in confs]
 
 
         for weight in weightings:
@@ -79,7 +88,7 @@ for has_Aconfig in with_Aconfig:
                 print("On {0} {1} {2}\nIncludes A conf? {3}".format(weight, taper, image_str, has_Aconfig))
 
                 imagename_run = os.path.join(datapath,
-                                            'M31_Field17_{0}_{1}_{2}_{3}_timematched'
+                                            'M31_Field17_{0}_{1}_{2}_{3}_xltimematched'
                                             .format(confs,
                                                     weight,
                                                     taper,
@@ -94,8 +103,8 @@ for has_Aconfig in with_Aconfig:
                                 intent='',
                                 datacolumn='corrected',
                                 imagename=imagename_run,
-                                imsize=4096,
-                                cell='0.5arcsec',
+                                imsize=2048,
+                                cell='1arcsec',
                                 scan=scan_select,
                                 phasecenter='',  # Only one field
                                 nchan=30,

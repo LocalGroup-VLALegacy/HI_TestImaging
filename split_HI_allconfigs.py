@@ -9,7 +9,7 @@ Split out science and HI SPW for A tracks.
 import os
 from glob import glob
 
-from tasks import split, concat, uvcontsub
+from tasks import split, concat, uvcontsub, mstransform
 
 fieldname = 'M31LARGE_17'
 fieldname_18A = 'M31_Field17'
@@ -88,13 +88,22 @@ concat(concatvis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_
        vis=output_names,
        timesort=True)
 
+mstransform(vis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms'),
+            outputvis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0_LSRK.ms'),
+            outframe='LSRK',
+            datacolumn='DATA',
+            regridms=True,
+            mode='channel',
+            interpolation='linear',
+            restfreq='1.42040575177GHz',)
+
 # Continuum subtraction
 # Doing this for now without masking out channels that should have signal
 # This is because the time interval is `int` and the HI is not bright enough to really matter
-uvcontsub(vis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms'),
+uvcontsub(vis=os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0_LSRK.ms'),
           fitorder=0)
 
-os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms'),
-                                 os.path.join(output_path, '18A-467_HI_spw_0.ms')))
-os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0.ms.contsub'),
-                                 os.path.join(output_path, '18A-467_HI_spw_0.ms.contsub')))
+os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0_LSRK.ms'),
+                                 os.path.join(output_path, '18A-467_HI_spw_0_LSRK.ms')))
+os.system("cp -r {0} {1}".format(os.path.join(basepath, '18A-467/products/HI/', '18A-467_HI_spw_0_LSRK.ms.contsub'),
+                                 os.path.join(output_path, '18A-467_HI_spw_0_LSRK.ms.contsub')))

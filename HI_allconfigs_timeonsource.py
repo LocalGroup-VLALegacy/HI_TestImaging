@@ -104,3 +104,38 @@ print(xltime_scans)
 # 'C': [9, 17, 25, 33, 41, 49, 57, 65, 135, 149, 157, 165, 173, 187, 195, 257, 265, 287, 295, 303, 317, 387, 395, 403, 411, 449, 465, 479, 495, 503, 517, 525],
 # 'B': [9, 17, 25, 33, 41, 49, 63, 71, 79, 133, 141, 149, 157, 165, 173, 187, 195, 203, 211, 257, 265, 273, 281, 295, 303, 311, 333, 387, 395, 409, 417, 433],
 # 'D': [26, 89, 152, 215, 278, 341, 404, 467, 530, 593, 656, 719, 782, 845, 908]}
+
+
+# We also want the mapping for the concatented MS.
+# Here, we account for the different configs by SPW, since each has a slight
+# offset in SPW and they're not transformed to match.
+
+concat_vis = os.path.join(datapath, 'M31_Field17_HI_ABCD.ms')
+
+config_to_spwmapping = {'D': 0, 'C': 1, 'B': 2, 'A': 3}
+
+config_scans = dict.fromkeys(['D', 'C', 'B', 'A'])
+
+msmd.open(concat_vis)
+
+for config in config_to_spwmapping:
+
+    config_scans[config] = msmd.scansforspw(spw=config_to_spwmapping[config])
+
+msmd.close()
+
+scan_time_dict = au.timeOnSource(concat_vis, field='0')['minutes_on_science_per_scan']
+scan_time_dict.update(au.timeOnSource(concat_vis, field='1')['minutes_on_science_per_scan'])
+
+xltime_scans_concat = dict.fromkeys(['D', 'C', 'B', 'A'])
+
+for config in config_scans:
+
+    this_config_scan_times = {scan: scan_time_dict[scan] for scan in config_scans[config]}
+
+    print(config, this_config_scan_times.keys())
+
+    xltime_scans_concat[config] = accumulate_to(this_config_scan_times,
+                                                target=time_on_source['D'] * 2.)
+
+print(xltime_scans_concat)

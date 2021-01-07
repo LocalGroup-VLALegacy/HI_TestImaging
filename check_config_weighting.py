@@ -22,12 +22,13 @@ vis_nocontsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms_M31_
                   'B': os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17'),
                   'A': os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms')}
 
-vis_contsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
+vis_contsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms.contsub_M31_Field17'),
                 'C': os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
                 'B': os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
                 'A': os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms.contsub')}
 
-vis_dicts = {'nocontsub': vis_nocontsubs, 'contsub': vis_contsubs}
+vis_dicts = {#'nocontsub': vis_nocontsubs,
+             'contsub': vis_contsubs}
 
 for name in vis_dicts.keys():
 
@@ -41,9 +42,10 @@ for name in vis_dicts.keys():
             spw='0',
             averagedata=True,
             avgchannel='4096',
+            avgtime='20',
             xaxis='uvwave', yaxis='wt', coloraxis='antenna1',
             title='{} config weights'.format(config),
-            plotfile='HI_allconfig_imagingtests/{0}_{1}_weights.png'.format(config, name),
+            plotfile='{2}/{0}_{1}_weights.png'.format(config, name, datapath),
             expformat='png',
             showgui=False)
 
@@ -69,9 +71,10 @@ for name in vis_dicts.keys():
             spw='0',
             averagedata=True,
             avgchannel='4096',
+            avgtime='20',
             xaxis='uvwave', yaxis='wt', coloraxis='antenna1',
             title='{} config weights'.format(config),
-            plotfile='HI_allconfig_imagingtests/{0}_{1}_weights_reweight_w_statwt.png'.format(config, name),
+            plotfile='{2}/{0}_{1}_weights_reweight_w_statwt.png'.format(config, name, datapath),
             expformat='png',
             showgui=False)
 

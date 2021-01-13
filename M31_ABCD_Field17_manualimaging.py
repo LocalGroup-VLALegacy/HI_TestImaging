@@ -43,9 +43,15 @@ xltime_scans = \
  'B': '1536,1666,1412,1750,1674,1420,1550,1682,1428,1774,1558,1436,1566,1696,1444,1574,1704,1820,1452,1582,1712,1842,1460,1758,1334,1720,1850,1866,1342,1728,1474,1590,1350,1736',
  'D': '908,845,782,719,656,593,530,467,404,341,278,215,152,89,26'}
 
-run_dirtyimaging = False
-run_shallowclean = False
-run_deepclean = True
+xltime_scans_random = \
+{'A': '1884,1894,1948,1922,1890,1939,1952,1871,1903,1896,1916,1926',
+ 'C': '1219,1181,1041,1127,1149,1095,1333,1203,1271,979,1249,1287,1233,987,963,1211,949,1017,1157,1033,971,1165,1049,1295,1279,1103,995,1003,925,1309,1025,1141',
+ 'B': '1390,1566,1704,1512,1728,1590,1350,1474,1520,1766,1482,1674,1812,1850,1558,1750,1642,1774,1628,1650,1658,1666,1866,1574,1404,1582,1498,1550,1682,1444,1620,1374,1452',
+ 'D': '719,782,26,404,593,845,467,152,530,89,215,278,341,656,908'}
+
+run_dirtyimaging = True
+run_shallowclean = True
+run_deepclean = False
 
 # Everything in one:
 
@@ -53,7 +59,9 @@ run_deepclean = True
 with_contsub = [True]
 
 # matched_time = [False, True]
-matched_time = [False]
+matched_time = [True]
+
+random_scan_order = True
 
 # nchan = 30
 nchan = 1
@@ -96,7 +104,10 @@ for i, setup_dict in enumerate(imaging_setups):
                 image_str = 'nocontsub'
 
             if time_match:
-                scan_select = ",".join([xltime_scans[config] for config in confs])
+                if random_scan_order:
+                    scan_select = ",".join([xltime_scans_random[config] for config in confs])
+                else:
+                    scan_select = ",".join([xltime_scans[config] for config in confs])
             else:
                 scan_select = ""
 
@@ -111,6 +122,13 @@ for i, setup_dict in enumerate(imaging_setups):
 
             print("On image size {0} with cell {1}".format(myimsize, mycell))
 
+            if time_match:
+                time_string = "xltimematched"
+                if random_scan_order:
+                    time_string += "_randomorder"
+            else:
+                time_string = "allscans"
+
             imagename_run = os.path.join(imagepath,
                                         'M31_Field17_{0}_{1}_robust{2}_taper_{3}_{4}_{5}_{6}_{7}_concatms'
                                         .format(confs,
@@ -120,7 +138,7 @@ for i, setup_dict in enumerate(imaging_setups):
                                                 image_str,
                                                 myimsize,
                                                 mycell,
-                                                'xltimematched' if time_match else "allscans"))
+                                                time_string))
 
             # Dirty map.
             if run_dirtyimaging:
@@ -212,7 +230,7 @@ for i, setup_dict in enumerate(imaging_setups):
                             uvtaper=[mytaper],
                             niter=100000,
                             cycleniter=500,  # Force many major cycles
-                            nsigma=4.,
+                            nsigma=2.,
                             # usemask='auto-multithresh',
                             usemask='user',
                             mask=mycleanmask,
@@ -246,6 +264,8 @@ for i, setup_dict in enumerate(imaging_setups):
 
                 # Delete the existing mask
                 os.system("rm -rf {0}.mask".format(imagename_run))
+                # Delete the existing image
+                os.system("rm -rf {0}.image".format(imagename_run))
 
                 mythreshold = '1.5mJy/beam'
 

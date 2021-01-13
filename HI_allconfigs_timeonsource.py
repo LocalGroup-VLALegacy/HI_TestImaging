@@ -2,10 +2,26 @@
 '''
 Find the time on source for all tracks covering M31LARGE_17 (or M31_Field17)
 pointing.
+
+The final time on source for the whole project will be:
+
+A: 180, B: 180, C: 180, D: 90
+
+With the times below, the "time-matched" version gives:
+A: 90, B: 90, C: 90, D: 45
+Effectively, this is half the depth. However, the mosaic will provide ~2
+improvement for each point within the inner parts of the mosaic.
+**So these archival data are closer to 25% of the depth.**
+
+Using all the time available, we have:
+A: 380, B: 142, C: 165, D: 46
+
 '''
 
 import os
-from copy import copy
+
+import random
+random.seed(42)
 
 import analysisUtils as au
 
@@ -17,7 +33,7 @@ datapath = os.path.join(basepath, '18A-467/HI_allconfig_imagingtests/')
 vis_nocontsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms_M31_Field17'),
                   'C': os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17'),
                   'B': os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17'),
-                  'A': os.path.join(datapath, '18A-467_HI_spw_0.ms')}
+                  'A': os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms')}
 
 time_on_source = dict.fromkeys(['D', 'C', 'B', 'A'])
 
@@ -51,7 +67,8 @@ print(ratios)
 # explore different combinations if there's an issue with those scans
 # (for whatever reason, should be fine, though)
 
-def accumulate_to(scantime_dict, target=time_on_source['D']):
+def accumulate_to(scantime_dict, target=time_on_source['D'],
+                  reorder_scans=True):
     '''
     Return the first N scans that match the target integration time.
     '''
@@ -59,7 +76,12 @@ def accumulate_to(scantime_dict, target=time_on_source['D']):
     total = 0.
     scans = []
 
-    for scan in scantime_dict:
+    scan_nums = list(scantime_dict.keys())
+
+    if reorder_scans:
+        random.shuffle(scan_nums)
+
+    for scan in scan_nums:
         total += scantime_dict[scan]
 
         scans.append(scan)
@@ -84,7 +106,7 @@ for config in vis_nocontsubs:
 
     # If this is D config, this should be ALL the scans. Do sanity check:
     if config == 'D':
-        assert equivtime_scans['D'] == list(out['minutes_on_science_per_scan'].keys())
+        assert all([scan in equivtime_scans['D'] for scan in list(out['minutes_on_science_per_scan'].keys())])
 
     equivtime_scans[config].sort()
     xltime_scans[config].sort()
@@ -105,6 +127,12 @@ print(xltime_scans)
 # 'B': [9, 17, 25, 33, 41, 49, 63, 71, 79, 133, 141, 149, 157, 165, 173, 187, 195, 203, 211, 257, 265, 273, 281, 295, 303, 311, 333, 387, 395, 409, 417, 433],
 # 'D': [26, 89, 152, 215, 278, 341, 404, 467, 530, 593, 656, 719, 782, 845, 908]}
 
+# With a random order used to choose the scans in each config.
+print(xltime_scans)
+# {'A': [6, 8, 23, 27, 31, 63, 74, 81, 83, 85, 87, 91],
+# 'C': [9, 17, 33, 41, 49, 57, 95, 103, 119, 127, 157, 165, 195, 211, 225, 257, 265, 287, 295, 303, 317, 325, 341, 349, 387, 403, 411, 441, 457, 479, 487, 517, 541],
+# 'B': [9, 25, 33, 41, 49, 63, 79, 87, 103, 141, 149, 157, 173, 187, 195, 203, 211, 219, 249, 257, 273, 295, 303, 311, 319, 333, 357, 379, 387, 417, 425, 433],
+# 'D': [26, 89, 152, 215, 278, 341, 404, 467, 530, 593, 656, 719, 782, 845, 908]}
 
 # We also want the mapping for the concatented MS.
 # Here, we account for the different configs by SPW, since each has a slight
@@ -139,3 +167,9 @@ for config in config_scans:
                                                 target=time_on_source['D'] * 2.)
 
 print(xltime_scans_concat)
+
+# With a random scan order
+# {'A': [1884, 1894, 1948, 1922, 1890, 1939, 1952, 1871, 1903, 1896, 1916, 1926],
+#  'C': [1219, 1181, 1041, 1127, 1149, 1095, 1333, 1203, 1271, 979, 1249, 1287, 1233, 987, 963, 1211, 949, 1017, 1157, 1033, 971, 1165, 1049, 1295, 1279, 1103, 995, 1003, 925, 1309, 1025, 1141],
+#  'B': [1390, 1566, 1704, 1512, 1728, 1590, 1350, 1474, 1520, 1766, 1482, 1674, 1812, 1850, 1558, 1750, 1642, 1774, 1628, 1650, 1658, 1666, 1866, 1574, 1404, 1582, 1498, 1550, 1682, 1444, 1620, 1374, 1452],
+#  'D': [719, 782, 26, 404, 593, 845, 467, 152, 530, 89, 215, 278, 341, 656, 908]}

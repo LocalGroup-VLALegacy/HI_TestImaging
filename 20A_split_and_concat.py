@@ -27,13 +27,22 @@ c_tracks = glob(os.path.join(output_path, "M31_C_*.regrid2kms"))
 
 bc_tracks = b_tracks + c_tracks
 
-outconcatvis =os.path.join(output_path, 'M31_20A-346_BC_HI.ms.contsub.regrid2kms.withflagging')
+outconcatvis =os.path.join(output_path, 'M31_20A-346_BC_HI.ms.contsub.regrid2kms_LSRK.withflagging')
 
 if not os.path.exists(outconcatvis):
+
+    outconcatvis_temp =os.path.join(output_path, 'M31_20A-346_BC_HI.ms.contsub.regrid2kms.withflagging')
 
     concat(concatvis=outconcatvis,
            vis=bc_tracks,
            timesort=False)
+
+    mstransform(vis=outconcatvis_temp,
+                outputvis=outconcatvis,
+                regridms=True, outframe='LSRK',
+                datacolumn='data')
+
+    rmtables(outconcatvis_temp)
 
 # Make a separate directory for all of the 7-pt splits
 hexsplit_dir = os.path.join(output_path, 'hexsplit_ms')
@@ -57,13 +66,21 @@ for track in bc_tracks:
 bctrack_splits = glob(os.path.join(hexsplit_dir, "*_7pthex"))
 
 # Concat all of the 20A 7-pt hex data together.
-outconcatvis_hex =os.path.join(output_path, 'M31_20A-346_ABC_hex_HI.ms.contsub.regrid2kms.withflagging')
+outconcatvis_hex =os.path.join(output_path, 'M31_20A-346_ABC_hex_HI.ms.contsub.regrid2kms_LSRK.withflagging')
 
 if not os.path.exists(outconcatvis_hex):
-    concat(concatvis=outconcatvis_hex,
-        vis=a_tracks + bctrack_splits,
-        timesort=False)
+    outconcatvis_hex_temp =os.path.join(output_path, 'M31_20A-346_ABC_hex_HI.ms.contsub.regrid2kms.withflagging')
 
+    concat(concatvis=outconcatvis_hex,
+           vis=bc_tracks,
+           timesort=False)
+
+    mstransform(vis=outconcatvis_hex_temp,
+                outputvis=outconcatvis_hex,
+                regridms=True, outframe='LSRK',
+                datacolumn='data')
+
+    rmtables(outconcatvis_hex_temp)
 
 # Now include the 14A and 15A data.
 
@@ -95,7 +112,7 @@ outconcatvis_BCD_full =os.path.join(output_path, 'M31_20A_14A_BCD_HI.ms.contsub.
 if not os.path.exists(outconcatvis_BCD_full):
 
     concat(concatvis=outconcatvis_BCD_full,
-           vis=bc_tracks + [regrid_14A_ms],
+           vis=[outconcatvis, regrid_14A_ms],
            timesort=False)
 
 
@@ -149,5 +166,5 @@ outconcatvis_hex_all =os.path.join(output_path, 'M31_20A_15A_14A_ABCD_hex_HI.ms.
 
 if not os.path.exists(outconcatvis_hex):
     concat(concatvis=outconcatvis_hex,
-        vis=bctrack_splits + [regrid_14A_hex_ms, regrid_15A_B_ms, regrid_15A_C_ms],
+        vis=[outconcatvis_hex, regrid_14A_hex_ms, regrid_15A_B_ms, regrid_15A_C_ms],
         timesort=False)

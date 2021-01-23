@@ -3,7 +3,7 @@
 These MSs are only HI and have already have continuum subtraction
 and regridding to the same spectral config (-700 to 30 km/s, 2 km/s channels).
 
-The exception is the 14A D-config data. These will be regridded to match
+The exception is the 14A and 15A data. These will be regridded to match
 the 20A data.
 '''
 
@@ -25,6 +25,13 @@ a_tracks = glob(os.path.join(output_path, "M31_A_*.regrid2kms"))
 b_tracks = glob(os.path.join(output_path, "M31_B_*.regrid2kms"))
 c_tracks = glob(os.path.join(output_path, "M31_C_*.regrid2kms"))
 
+run_statwt = False
+
+if run_statwt:
+    # Re-run statwt on everything
+    for track in a_tracks + b_tracks + c_tracks:
+        statwt(vis=track, datacolumn='data')
+
 bc_tracks = b_tracks + c_tracks
 
 outconcatvis =os.path.join(output_path, 'M31_20A-346_BC_HI.ms.contsub.regrid2kms_LSRK.withflagging')
@@ -37,13 +44,6 @@ if not os.path.exists(outconcatvis):
            vis=bc_tracks,
            timesort=False)
 
-    mstransform(vis=outconcatvis_temp,
-                outputvis=outconcatvis,
-                regridms=True, outframe='LSRK',
-                datacolumn='data')
-
-    rmtables(outconcatvis_temp)
-
 # Make a separate directory for all of the 7-pt splits
 hexsplit_dir = os.path.join(output_path, 'hexsplit_ms')
 
@@ -55,6 +55,7 @@ for track in bc_tracks:
 
     outvis = "{0}/{1}_7pthex".format(hexsplit_dir,
                                      os.path.split(track)[1])
+
     if os.path.exists(outvis):
         casalog.post("{} exists. Skipping split".format(outvis))
 
@@ -72,15 +73,8 @@ if not os.path.exists(outconcatvis_hex):
     outconcatvis_hex_temp =os.path.join(output_path, 'M31_20A-346_ABC_hex_HI.ms.contsub.regrid2kms.withflagging')
 
     concat(concatvis=outconcatvis_hex,
-           vis=bc_tracks,
+           vis=bctrack_splits + a_tracks,
            timesort=False)
-
-    mstransform(vis=outconcatvis_hex_temp,
-                outputvis=outconcatvis_hex,
-                regridms=True, outframe='LSRK',
-                datacolumn='data')
-
-    rmtables(outconcatvis_hex_temp)
 
 # Now include the 14A and 15A data.
 
@@ -164,7 +158,7 @@ if not os.path.exists(regrid_15A_C_ms):
 
 outconcatvis_hex_all =os.path.join(output_path, 'M31_20A_15A_14A_ABCD_hex_HI.ms.contsub.regrid2kms')
 
-if not os.path.exists(outconcatvis_hex):
-    concat(concatvis=outconcatvis_hex,
+if not os.path.exists(outconcatvis_hex_all):
+    concat(concatvis=outconcatvis_hex_all,
         vis=[outconcatvis_hex, regrid_14A_hex_ms, regrid_15A_B_ms, regrid_15A_C_ms],
         timesort=False)

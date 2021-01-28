@@ -26,12 +26,12 @@ datapath = os.path.join(basepath, '18A-467/HI_allconfig_imagingtests/')
 vis_contsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms.contsub_M31_Field17'),
                 'C': os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
                 'B': os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
-                'A': os.path.join(datapath, '18A-467_HI_spw_0.ms.contsub')}
+                'A': os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms.contsub')}
 
 vis_nocontsubs = {'D': os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms_M31_Field17'),
                   'C': os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17'),
                   'B': os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17'),
-                  'A': os.path.join(datapath, '18A-467_HI_spw_0.ms')}
+                  'A': os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms')}
 
 equivtime_scans = \
     {'A': "4,6,8,10,12,14",
@@ -55,9 +55,16 @@ with_Aconfig = [True, False]
 
 # with_contsub = [False, True]
 with_contsub = [False]
-weightings = ['natural', 'briggs']
+weightings = ['natural']
+# weightings = ['natural', 'briggs']
 # tapers = ['', '5arcsec']
 tapers = ['']
+
+# myimsize = 4096
+# mycellsize = '0.5arcsec'
+
+myimsize = 2048
+mycellsize = '1arcsec'
 
 for has_Aconfig in with_Aconfig:
 
@@ -88,11 +95,13 @@ for has_Aconfig in with_Aconfig:
                 print("On {0} {1} {2}\nIncludes A conf? {3}".format(weight, taper, image_str, has_Aconfig))
 
                 imagename_run = os.path.join(datapath,
-                                            'M31_Field17_{0}_{1}_{2}_{3}_xltimematched'
+                                            'M31_Field17_{0}_{1}_{2}_{3}_{4}_{5}_xltimematched_run2'
                                             .format(confs,
                                                     weight,
                                                     taper,
-                                                    image_str))
+                                                    image_str,
+                                                    myimsize,
+                                                    mycellsize))
 
                 # Dirty map.
                 if run_dirtyimaging:
@@ -103,8 +112,8 @@ for has_Aconfig in with_Aconfig:
                                 intent='',
                                 datacolumn='corrected',
                                 imagename=imagename_run,
-                                imsize=2048,
-                                cell='1arcsec',
+                                imsize=4096,
+                                cell=mycellsize,
                                 scan=scan_select,
                                 phasecenter='',  # Only one field
                                 nchan=30,

@@ -8,6 +8,11 @@
 * Shallow clean (~5 sigma)
 * Deeper/fully clean (~2 sigma)
 
+Notes:
+
+* with all data included, the beam is 8.3x7.3 arcsec with briggs robust=0.5 weighting
+*
+
 '''
 
 from tasks import tclean
@@ -22,12 +27,12 @@ datapath = os.path.join(basepath, '18A-467/HI_allconfig_imagingtests/')
 vis_contsubs = [os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms.contsub_M31_Field17'),
                 os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
                 os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17.contsub'),
-                os.path.join(datapath, '18A-467_HI_spw_0.ms.contsub')]
+                os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms.contsub')]
 
 vis_nocontsubs = [os.path.join(datapath, 'M31_14A-235_HI_spw_0_LSRK.ms_M31_Field17'),
                   os.path.join(datapath, '15A-175_Ctracks_HI_spw_0_LSRK.ms_M31_Field17'),
                   os.path.join(datapath, '15A-175_Btracks_HI_spw_0_LSRK.ms_M31_Field17'),
-                  os.path.join(datapath, '18A-467_HI_spw_0.ms')]
+                  os.path.join(datapath, '18A-467_HI_spw_0_LSRK.ms')]
 
 run_dirtyimaging = True
 run_shallowclean = False
@@ -38,8 +43,9 @@ run_deepclean = False
 with_Aconfig = [True, False]
 
 with_contsub = [False, True]
-weightings = ['natural', 'robust']
-tapers = ['', ['5arcsec']]
+weightings = ['natural', 'briggs']
+# tapers = ['', '5arcsec']
+tapers = ['']
 
 for has_Aconfig in with_Aconfig:
 
@@ -62,25 +68,29 @@ for has_Aconfig in with_Aconfig:
 
             for taper in tapers:
 
-                print("On {0} {1} {2} Includes A conf {3}".format(weight, taper, image_str, has_Aconfig))
+                print("On {0} {1} {2}\nIncludes A conf? {3}".format(weight, taper, image_str, has_Aconfig))
 
                 imagename_run = os.path.join(datapath,
-                                            'M31_Field17_ABCD_{0}_{1}_{2}'.format(weight, taper, image_str))
+                                            'M31_Field17_{0}_{1}_{2}_{3}'
+                                            .format('ABCD' if with_Aconfig else 'BCD',
+                                                    weight,
+                                                    taper,
+                                                    image_str))
 
                 # Dirty map.
                 if run_dirtyimaging:
 
-                    tclean(vis=vis_contsubs,
-                        field='M33',
+                    tclean(vis=myvis,
+                        field='M31*',
                         spw='0',
-                        intent='OBSERVE_TARGET#ON_SOURCE',
+                        intent='',
                         datacolumn='corrected',
                         imagename=imagename_run,
                         imsize=4096,
                         cell='0.5arcsec',
                         phasecenter='',  # Only one field
-                        nchan=27,
-                        start='-250km/s',
+                        nchan=30,
+                        start='-270km/s',
                         width='10km/s',
                         specmode='cube',
                         outframe='LSRK',
@@ -93,8 +103,9 @@ for has_Aconfig in with_Aconfig:
                         scales=[0, 5, 10],
                         restoration=True,
                         pbcor=False,
-                        weighting='briggs',
-                        robust=0.5,
+                        weighting=weight,
+                        robust=0.0,
+                        uvtaper=[taper],
                         niter=0,
                         cycleniter=100,  # Force many major cycles
                         nsigma=4.,
@@ -115,4 +126,5 @@ for has_Aconfig in with_Aconfig:
                         calcres=True,
                         calcpsf=True,
                         smallscalebias=0.0,
+                        restfreq='1.42040575177GHz',
                         )

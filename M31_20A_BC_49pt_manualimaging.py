@@ -277,3 +277,6 @@ for i, setup_dict in enumerate(imaging_setups):
                             smallscalebias=0.0,
                             restfreq='1.42040575177GHz',
                             )
+            impbcor(imagename="{0}.image".format(imagename_run),
+                    pbimage="{0}.pb".format(imagename_run),
+                    outfile="{0}.image.pbcor".format(imagename_run))

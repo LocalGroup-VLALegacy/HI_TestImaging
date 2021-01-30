@@ -23,7 +23,7 @@ vis_contsub = os.path.join(datapath, 'M31_20A_14A_BCD_HI.ms.contsub.regrid2kms')
 
 run_dirtyimaging = True
 run_shallowclean = True
-run_deepclean = False
+run_deepclean = True
 
 # Everything in one:
 
@@ -42,7 +42,7 @@ nchan = 1
 startvel = -180
 startchan = vel_to_channel(startvel)
 
-imaging_setups = [{'weight': 'briggs', 'robust': 1., 'taper': "", 'cell': '1.4arcsec'},
+imaging_setups = [{'weight': 'briggs', 'robust': 1., 'taper': "", 'cell': '2.0arcsec'},
                 #   {'weight': 'briggs', 'robust': 0., 'taper': "", 'cell': '0.4arcsec'},
                 #   {'weight': 'briggs', 'robust': -1., 'taper': "", 'cell': '0.3arcsec'},
                 #   {'weight': 'natural', 'robust': 0., 'taper': "", 'cell': '1.8arcsec'},
@@ -69,6 +69,10 @@ scan_select = ''
 myvis = vis_contsub
 
 niter_shallow = 5000
+niter_deep = 50000
+
+cycleniter_shallow = 500
+cycleniter_deep = 1000
 
 for i, setup_dict in enumerate(imaging_setups):
 
@@ -187,7 +191,7 @@ for i, setup_dict in enumerate(imaging_setups):
                             robust=myrobust,
                             uvtaper=[mytaper],
                             niter=niter_shallow,
-                            cycleniter=500,  # Force many major cycles
+                            cycleniter=cycleniter_shallow,  # Force many major cycles
                             nsigma=2.,
                             usemask='auto-multithresh',
                             # mask=mycleanmask,
@@ -254,9 +258,9 @@ for i, setup_dict in enumerate(imaging_setups):
                             weighting=myweight,
                             robust=myrobust,
                             uvtaper=[mytaper],
-                            niter=100000,
-                            cycleniter=500,  # Force many major cycles
-                            nsigma=4.,
+                            niter=niter_deep,
+                            cycleniter=cycleniter_deep,  # Force many major cycles
+                            nsigma=2.,
                             # usemask='auto-multithresh',
                             usemask='pb',
                             mask='',
@@ -278,3 +282,7 @@ for i, setup_dict in enumerate(imaging_setups):
                             smallscalebias=0.0,
                             restfreq='1.42040575177GHz',
                             )
+
+            impbcor(imagename="{0}.image".format(imagename_run),
+                    pbimage="{0}.pb".format(imagename_run),
+                    outfile="{0}.image.pbcor".format(imagename_run))

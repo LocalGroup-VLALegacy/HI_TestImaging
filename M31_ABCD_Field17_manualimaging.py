@@ -49,9 +49,9 @@ xltime_scans_random = \
  'B': '1390,1566,1704,1512,1728,1590,1350,1474,1520,1766,1482,1674,1812,1850,1558,1750,1642,1774,1628,1650,1658,1666,1866,1574,1404,1582,1498,1550,1682,1444,1620,1374,1452',
  'D': '719,782,26,404,593,845,467,152,530,89,215,278,341,656,908'}
 
-run_dirtyimaging = True
-run_shallowclean = True
-run_deepclean = False
+run_dirtyimaging = False
+run_shallowclean = False
+run_deepclean = True
 
 # Everything in one:
 
@@ -87,6 +87,13 @@ confs = 'ABCD'
 mycleanmask = 'M31_Field17_ABCD_cleanmask_from_15A.mask'
 
 mypblimit = 0.1
+
+niter_shallow = 5000
+niter_deep = 20000
+
+cycleniter_shallow = 500
+cycleniter_deep = 2000
+
 
 for i, setup_dict in enumerate(imaging_setups):
 
@@ -228,8 +235,8 @@ for i, setup_dict in enumerate(imaging_setups):
                             weighting=myweight,
                             robust=myrobust,
                             uvtaper=[mytaper],
-                            niter=100000,
-                            cycleniter=500,  # Force many major cycles
+                            niter=niter_shallow,
+                            cycleniter=cycleniter_shallow,  # Force many major cycles
                             nsigma=2.,
                             # usemask='auto-multithresh',
                             usemask='user',
@@ -290,14 +297,14 @@ for i, setup_dict in enumerate(imaging_setups):
                             pblimit=mypblimit,
                             pbmask=mypblimit,
                             deconvolver='multiscale',
-                            scales=[0, 6, 18, 30, 60, 120, 240],
+                            scales=[0, 6, 18, 30],
                             restoration=True,
                             pbcor=False,
                             weighting=myweight,
                             robust=myrobust,
                             uvtaper=[mytaper],
-                            niter=100000,
-                            cycleniter=500,  # Force many major cycles
+                            niter=niter_deep,
+                            cycleniter=cycleniter_deep,  # Force many major cycles
                             nsigma=4.,
                             # usemask='auto-multithresh',
                             usemask='pb',
@@ -320,3 +327,7 @@ for i, setup_dict in enumerate(imaging_setups):
                             smallscalebias=0.0,
                             restfreq='1.42040575177GHz',
                             )
+
+            impbcor(imagename="{0}.image".format(imagename_run),
+                    pbimage="{0}.pb".format(imagename_run),
+                    outfile="{0}.image.pbcor".format(imagename_run))

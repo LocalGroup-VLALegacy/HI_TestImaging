@@ -26,9 +26,9 @@ imagepath = os.path.join(output_path, 'A_only_imaging')
 if not os.path.exists(imagepath):
     os.mkdir(imagepath)
 
-run_dirtyimaging = True
+run_dirtyimaging = False
 run_shallowclean = False
-run_deepclean = False
+run_deepclean = True
 
 # Everything in one:
 
@@ -62,7 +62,11 @@ mycleanmask = ''
 mypblimit = 0.1
 
 niter_shallow = 5000
-niter_deep = 50000
+niter_deep = 20000
+
+cycleniter_shallow = 500
+cycleniter_deep = 2000
+
 
 for i, setup_dict in enumerate(imaging_setups):
 
@@ -264,16 +268,15 @@ for i, setup_dict in enumerate(imaging_setups):
                         pblimit=mypblimit,
                         pbmask=mypblimit,
                         deconvolver='multiscale',
-                        scales=[0, 6, 18, 30, 60, 120, 240],
+                        scales=[0, 6, 18, 30],
                         restoration=True,
                         pbcor=False,
                         weighting=myweight,
                         robust=myrobust,
                         uvtaper=[mytaper],
                         niter=niter_deep,
-                        cycleniter=1000,  # Force many major cycles
+                        cycleniter=cycleniter_deep,  # Force many major cycles
                         nsigma=2.,
-                        # usemask='auto-multithresh',
                         usemask='pb',
                         mask='',
                         sidelobethreshold=1.0,

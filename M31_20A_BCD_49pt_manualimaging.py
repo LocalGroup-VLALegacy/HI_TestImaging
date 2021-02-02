@@ -21,9 +21,10 @@ if not os.path.exists(imagepath):
 
 vis_contsub = os.path.join(datapath, 'M31_20A_14A_BCD_HI.ms.contsub.regrid2kms')
 
-run_dirtyimaging = True
-run_shallowclean = True
+run_dirtyimaging = False
+run_shallowclean = False
 run_deepclean = True
+run_restoreonly = False
 
 # Everything in one:
 
@@ -69,10 +70,10 @@ scan_select = ''
 myvis = vis_contsub
 
 niter_shallow = 5000
-niter_deep = 50000
+niter_deep = 15000
 
 cycleniter_shallow = 500
-cycleniter_deep = 1000
+cycleniter_deep = 1500
 
 for i, setup_dict in enumerate(imaging_setups):
 
@@ -108,7 +109,6 @@ for i, setup_dict in enumerate(imaging_setups):
                             field='M31*',
                             spw='',
                             intent='',
-                            # observation='0~2,4~12',
                             datacolumn='corrected',
                             imagename=imagename_run,
                             imsize=myimsize,
@@ -274,6 +274,63 @@ for i, setup_dict in enumerate(imaging_setups):
                             minpercentchange=1.0,
                             # fastnoise=False,
                             threshold=mythreshold,
+                            interactive=0,
+                            savemodel='none',
+                            parallel=False,
+                            calcres=False,
+                            calcpsf=False,
+                            smallscalebias=0.0,
+                            restfreq='1.42040575177GHz',
+                            )
+
+            impbcor(imagename="{0}.image".format(imagename_run),
+                    pbimage="{0}.pb".format(imagename_run),
+                    outfile="{0}.image.pbcor".format(imagename_run))
+
+            # Restore only.
+            if run_restoreonly:
+
+                out = tclean(vis=myvis,
+                            field='M31*',
+                            spw='',
+                            intent='',
+                            datacolumn='corrected',
+                            imagename=imagename_run,
+                            imsize=myimsize,
+                            cell=mycell,
+                            scan=scan_select,
+                            phasecenter="J2000 00h42m44.350 +41d16m08.63",
+                            nchan=nchan,
+                            start=startchan,
+                            width=1,
+                            specmode='cube',
+                            outframe='LSRK',
+                            gridder='mosaic',
+                            chanchunks=-1,
+                            mosweight=True,  # False,
+                            pblimit=mypblimit,
+                            pbmask=mypblimit,
+                            deconvolver='multiscale',
+                            scales=[0, 5, 10],
+                            restoration=True,
+                            pbcor=False,
+                            weighting=myweight,
+                            robust=myrobust,
+                            uvtaper=[mytaper],
+                            niter=0,
+                            cycleniter=100,  # Force many major cycles
+                            nsigma=4.,
+                            usemask='auto-multithresh',
+                            sidelobethreshold=1.0,
+                            noisethreshold=3.0,
+                            lownoisethreshold=1.5,
+                            negativethreshold=0.0,
+                            minbeamfrac=0.1,
+                            growiterations=75,
+                            dogrowprune=True,
+                            minpercentchange=1.0,
+                            # fastnoise=False,
+                            threshold='',
                             interactive=0,
                             savemodel='none',
                             parallel=False,
